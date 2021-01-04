@@ -1,9 +1,9 @@
 package main
 
-import vector_space "jayeze/vector-space"
+import vectorspace "jayeze/vector-space"
 
 func main() {
-	v := vector_space.NewVectorizer("indexFile", 3)
+	v := vectorspace.NewVectorizer("/home/raha/go/src/shakhes/blocks4/1.txt", 100)
 	v.Vectorize()
-	v.Query("نشست کمیسیون")
+	v.Query("منصوریان")
 }
