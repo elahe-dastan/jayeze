@@ -2,6 +2,7 @@ package vector_space
 
 import (
 	"container/heap"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	heap2 "jayeze/heap"
@@ -108,16 +109,22 @@ func (v *Vectorizer) calculateTFIDF() {
 	}
 }
 
-func (v *Vectorizer) Query(query string) {
+func (v *Vectorizer) Query(query string) string {
 	queryVector := v.queryVectorizer(query)
 	v.cosineSimilarity(queryVector)
-	fmt.Println(v.heap)
+	ans, err := json.Marshal(v.heap)
+	fmt.Println(ans)
+	if err != nil{
+		log.Fatal(err)
+	}
+	return string(ans)
 }
 
 func (v *Vectorizer) queryVectorizer(query string) []float64 {
 	vector := make([]float64, v.termsNum)
 
 	tokens := strings.Split(query, " ")
+	fmt.Println(tokens)
 	for _, t := range tokens {
 		index, ok := v.termIndex[t]
 		if !ok {
@@ -125,7 +132,6 @@ func (v *Vectorizer) queryVectorizer(query string) []float64 {
 		}
 		vector[index]++
 	}
-
 	return vector
 }
 
