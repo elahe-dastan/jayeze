@@ -53,7 +53,7 @@ func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
 		tfIdf[i] = make([]float64, len(lines))
 	}
 
-	center := make([]float64, docsNum)
+	center := make([]float64, len(lines))
 
 	h := &heap2.SimilarityHeap{}
 	heap.Init(h)
@@ -74,6 +74,7 @@ func (v *Vectorizer) Vectorize() {
 	v.calculateIDF()
 	v.calculateTF()
 	v.calculateTFIDF()
+	v.calculateCenter()
 }
 
 func (v *Vectorizer) calculateIDF() {
@@ -124,6 +125,8 @@ func (v *Vectorizer) calculateCenter() {
 	for i := 0; i < v.termsNum; i++ {
 		v.center[i] /= float64(v.docsNum)
 	}
+
+	fmt.Println(v.center)
 }
 
 func (v *Vectorizer) Query(query string) string {

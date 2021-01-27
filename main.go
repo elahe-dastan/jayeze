@@ -28,7 +28,7 @@ func main() {
 
 	e := echo.New()
 	e.GET("/:query", query)
-	e.GET("/cluster/:query", clusterQuery)
+	//e.GET("/cluster/:query", clusterQuery)
 	e.Logger.Fatal(e.Start(":1373"))
 }
 
@@ -37,8 +37,8 @@ func vectorize(k *koanf.Koanf, f *file.File) {
 		log.Fatal(err)
 	}
 	m := k.All()
-	v = vectorspace.NewVectorizer(m["indexPath"].(string), int(m["docsNum"].(float64)))
-	v.Vectorize()
+	//v = vectorspace.NewVectorizer(m["indexPath"].(string), int(m["docsNum"].(float64)))
+	//v.Vectorize()
 
 
 	// kesafat
@@ -68,6 +68,6 @@ func query(c echo.Context) error {
 	return c.JSON(http.StatusOK, v.Query(c.Param("query")))
 }
 
-func clusterQuery(c echo.Context) error {
-	return c.JSON(http.StatusOK, )
-}
+//func clusterQuery(c echo.Context) error {
+//	return c.JSON(http.StatusOK, )
+//}
