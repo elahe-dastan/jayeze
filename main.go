@@ -27,8 +27,8 @@ func main() {
 	vectorize(k, f)
 
 	e := echo.New()
-	e.GET("/:query", query)
-	//e.GET("/cluster/:query", clusterQuery)
+	//e.GET("/:query", query)
+	e.GET("/cluster/:query", clusterQuery)
 	e.Logger.Fatal(e.Start(":1373"))
 }
 
@@ -68,6 +68,15 @@ func query(c echo.Context) error {
 	return c.JSON(http.StatusOK, v.Query(c.Param("query")))
 }
 
-//func clusterQuery(c echo.Context) error {
-//	return c.JSON(http.StatusOK, )
-//}
+func clusterQuery(c echo.Context) error {
+	minCos := float64(0)
+	for _, vector := range clusterVectors{
+		cos := vector.CenterCosineSimilarity(c.Param("query"))
+		if cos < minCos{
+			minCos = cos
+			v = vector
+		}
+	}
+
+	return c.JSON(http.StatusOK, v.Query(c.Param("query")))
+}

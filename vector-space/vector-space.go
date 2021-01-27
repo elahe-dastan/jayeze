@@ -140,6 +140,20 @@ func (v *Vectorizer) Query(query string) string {
 	return string(ans)
 }
 
+func (v *Vectorizer) CenterCosineSimilarity(query string) float64 {
+	queryVector := v.queryVectorizer(query)
+	// query vector is not normalized and it's vector is just tf not tf-idf
+	innerProduct := float64(0)
+	norm := float64(0) // this is norm powered by two
+	for i, tfIdf := range v.center {
+		innerProduct += tfIdf * queryVector[i]
+		norm += math.Pow(tfIdf, 2)
+	}
+	cos := innerProduct / math.Sqrt(norm)
+
+	return cos
+}
+
 func (v *Vectorizer) queryVectorizer(query string) []float64 {
 	vector := make([]float64, v.termsNum)
 
@@ -171,5 +185,4 @@ func (v *Vectorizer) cosineSimilarity(queryVector []float64) {
 			Cos:   cos,
 		})
 	}
-
 }
