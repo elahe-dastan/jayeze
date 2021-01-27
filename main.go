@@ -69,11 +69,11 @@ func query(c echo.Context) error {
 }
 
 func clusterQuery(c echo.Context) error {
-	minCos := float64(0)
+	maxCosSimilarity := float64(0)
 	for _, vector := range clusterVectors{
 		cos := vector.CenterCosineSimilarity(c.Param("query"))
-		if cos < minCos{
-			minCos = cos
+		if cos > maxCosSimilarity {
+			maxCosSimilarity = cos
 			v = vector
 		}
 	}
