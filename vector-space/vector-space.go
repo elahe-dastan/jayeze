@@ -22,6 +22,7 @@ type Vectorizer struct {
 	tfIdf            [][]float64
 	termIndex        map[string]int
 	heap             *heap2.SimilarityHeap
+	center           []float64
 }
 
 func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
@@ -52,6 +53,8 @@ func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
 		tfIdf[i] = make([]float64, len(lines))
 	}
 
+	center := make([]float64, docsNum)
+
 	h := &heap2.SimilarityHeap{}
 	heap.Init(h)
 
@@ -63,6 +66,7 @@ func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
 		tfIdf:            tfIdf,
 		termIndex:        termIndex,
 		heap:             h,
+		center:           center,
 	}
 }
 
@@ -109,12 +113,25 @@ func (v *Vectorizer) calculateTFIDF() {
 	}
 }
 
+func (v *Vectorizer) calculateCenter() {
+	for i := 0; i < v.docsNum; i++ {
+		vector := v.tfIdf[i]
+		for j := 0; j < v.termsNum; j++ {
+			v.center[j] += vector[j]
+		}
+	}
+
+	for i := 0; i < v.termsNum; i++ {
+		v.center[i] /= float64(v.docsNum)
+	}
+}
+
 func (v *Vectorizer) Query(query string) string {
 	queryVector := v.queryVectorizer(query)
 	v.cosineSimilarity(queryVector)
 	ans, err := json.Marshal(v.heap)
 	fmt.Println(ans)
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 	return string(ans)
