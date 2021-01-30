@@ -1,13 +1,15 @@
 package main
 
 import (
+	vectorspace "jayeze/vector-space"
+	"log"
+	"net/http"
+
+	"github.com/elahe-dastan/trunk/normalize"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/labstack/echo/v4"
-	vectorspace "jayeze/vector-space"
-	"log"
-	"net/http"
 )
 
 var v *vectorspace.Vectorizer
@@ -27,7 +29,7 @@ func main() {
 	vectorize(k, f)
 
 	e := echo.New()
-	//e.GET("/:query", query)
+	e.GET("/:query", query)
 	e.GET("/cluster/:query", clusterQuery)
 	e.Logger.Fatal(e.Start(":1373"))
 }
@@ -37,8 +39,8 @@ func vectorize(k *koanf.Koanf, f *file.File) {
 		log.Fatal(err)
 	}
 	m := k.All()
-	//v = vectorspace.NewVectorizer(m["indexPath"].(string), int(m["docsNum"].(float64)))
-	//v.Vectorize()
+	v = vectorspace.NewVectorizer(m["indexPath"].(string), int(m["docsNum"].(float64)))
+	v.Vectorize()
 
 
 	// kesafat
@@ -65,18 +67,19 @@ func vectorize(k *koanf.Koanf, f *file.File) {
 }
 
 func query(c echo.Context) error {
-	return c.JSON(http.StatusOK, v.Query(c.Param("query")))
+	return c.JSON(http.StatusOK, v.Query(normalize.Normalize(c.Param("query"))[0]))
 }
 
 func clusterQuery(c echo.Context) error {
+	var vr *vectorspace.Vectorizer
 	maxCosSimilarity := float64(0)
 	for _, vector := range clusterVectors{
 		cos := vector.CenterCosineSimilarity(c.Param("query"))
 		if cos > maxCosSimilarity {
 			maxCosSimilarity = cos
-			v = vector
+			vr = vector
 		}
 	}
 
-	return c.JSON(http.StatusOK, v.Query(c.Param("query")))
+	return c.JSON(http.StatusOK, vr.Query(c.Param("query")))
 }
