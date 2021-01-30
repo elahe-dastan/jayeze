@@ -133,8 +133,12 @@ func (v *Vectorizer) Query(query string) string {
 	queryVector := v.queryVectorizer(query)
 	v.cosineSimilarity(queryVector)
 	answer := ""
-	for i := 0; i < 10; i++ {
-		ans, err := json.Marshal(v.heap.Pop())
+	for i := 0; i < 100; i++ {
+		docSimilarity := heap.Pop(v.heap).(heap2.Similarity)
+		if docSimilarity.Cos == 0{
+			break
+		}
+		ans, err := json.Marshal(docSimilarity)
 		//fmt.Println(ans)
 		if err != nil {
 			log.Fatal(err)
