@@ -8,9 +8,5 @@ type Cluster struct {
 type Config struct {
 	IndexPath string    `koanf:"indexPath"`
 	DocsSize  int       `koanf:"docsNum"`
-	clusters  []Cluster `koanf:"clusters"`
-}
-
-func Read() *Config {
-	
+	Clusters  []Cluster `koanf:"clusters"`
 }
