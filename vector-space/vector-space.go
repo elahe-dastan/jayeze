@@ -126,18 +126,23 @@ func (v *Vectorizer) calculateCenter() {
 		v.center[i] /= float64(v.docsNum)
 	}
 
-	fmt.Println(v.center)
+	//fmt.Println(v.center)
 }
 
 func (v *Vectorizer) Query(query string) string {
 	queryVector := v.queryVectorizer(query)
 	v.cosineSimilarity(queryVector)
-	ans, err := json.Marshal(v.heap)
-	fmt.Println(ans)
-	if err != nil {
-		log.Fatal(err)
+	answer := ""
+	for i := 0; i < 10; i++ {
+		ans, err := json.Marshal(v.heap.Pop())
+		//fmt.Println(ans)
+		if err != nil {
+			log.Fatal(err)
+		}
+		answer += string(ans)
 	}
-	return string(ans)
+
+	return answer
 }
 
 func (v *Vectorizer) CenterCosineSimilarity(query string) float64 {
@@ -158,7 +163,7 @@ func (v *Vectorizer) queryVectorizer(query string) []float64 {
 	vector := make([]float64, v.termsNum)
 
 	tokens := strings.Split(query, " ")
-	fmt.Println(tokens)
+	//fmt.Println(tokens)
 	for _, t := range tokens {
 		index, ok := v.termIndex[t]
 		if !ok {
@@ -173,6 +178,7 @@ func (v *Vectorizer) queryVectorizer(query string) []float64 {
 func (v *Vectorizer) cosineSimilarity(queryVector []float64) {
 	// query vector is not normalized and it's vector is just tf not tf-idf
 	for docId, doc := range v.tfIdf {
+		fmt.Println(docId)
 		innerProduct := float64(0)
 		norm := float64(0) // this is norm powered by two
 		for i, tfIdf := range doc {
