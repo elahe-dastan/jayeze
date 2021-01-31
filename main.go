@@ -50,13 +50,13 @@ func vectorize(k *koanf.Koanf, f *file.File) {
 	v = vectorspace.NewVectorizer(cfg.IndexPath, cfg.DocsSize)
 	v.Vectorize()
 
-	clusterVectors = make([]*vectorspace.Vectorizer, 5)
-	clusters := cfg.Clusters
-	for i, cluster := range clusters{
-		vectorizer := vectorspace.NewVectorizer(cluster.Path, cluster.Size)
-		vectorizer.Vectorize()
-		clusterVectors[i] = vectorizer
-	}
+	//clusterVectors = make([]*vectorspace.Vectorizer, 5)
+	//clusters := cfg.Clusters
+	//for i, cluster := range clusters{
+	//	vectorizer := vectorspace.NewVectorizer(cluster.Path, cluster.Size)
+	//	vectorizer.Vectorize()
+	//	clusterVectors[i] = vectorizer
+	//}
 }
 
 func query(c echo.Context) error {

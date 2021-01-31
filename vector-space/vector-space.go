@@ -10,7 +10,6 @@ import (
 	"jayeze/tokenize"
 	"log"
 	"math"
-	"strconv"
 	"strings"
 )
 
@@ -44,7 +43,7 @@ func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
 		termPostingList := tokenize.Unmarshal(l)
 		termPostingLists[i] = termPostingList
 		termIndex[termPostingList.Term] = i
-		finalTermPostingList := tokenize.UnmarshalFinal(l)
+		finalTermPostingList := tokenize.Unmarshal(l)
 		docIds := make([]int, len(finalTermPostingList.PostingList))
 		for j, p := range finalTermPostingList.PostingList {
 			docIds[j] = p.DocId
@@ -107,11 +106,7 @@ func (v *Vectorizer) calculateTF() {
 	// i expresses term index
 	for i, t := range v.termPostingLists {
 		for j := 0; j < len(t.PostingList); j++ {
-			docId, err := strconv.Atoi(t.PostingList[j])
-			if err != nil {
-				log.Fatal(err)
-			}
-
+			docId := t.PostingList[j].DocId
 			v.tf[docId-1][i]++
 		}
 	}
