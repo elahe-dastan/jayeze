@@ -3,7 +3,6 @@ package vector_space
 import (
 	"container/heap"
 	"encoding/json"
-	"fmt"
 	"github.com/elahe-dastan/trunk/normalize"
 	"io/ioutil"
 	heap2 "jayeze/heap"
@@ -149,9 +148,9 @@ func (v *Vectorizer) Query(query string) string {
 	}
 
 	queryVector := v.queryVectorizer(normalizedQuery)
-	v.cosineSimilarity(queryVector, normalizedQuery)
+	heapSize := v.cosineSimilarity(queryVector, normalizedQuery)
 	answer := ""
-	for i := 0; i < 100; i++ {
+	for i := 0; i < heapSize; i++ {
 		docSimilarity := heap.Pop(v.heap).(heap2.Similarity)
 		if docSimilarity.Cos == 0 {
 			break
@@ -214,10 +213,12 @@ func (v *Vectorizer) indexElimination(query []string) []int{
 }
 
 // read only the p_docs in the posting list -- first read only the p_docs in the champion list
-func (v *Vectorizer) cosineSimilarity(queryVector []float64, query []string) {
-	fmt.Println(v.indexElimination(query))
+func (v *Vectorizer) cosineSimilarity(queryVector []float64, query []string) int {
+	heapSize := 0
+	docIds := v.indexElimination(query)
 	// query vector is not normalized and it's vector is just tf not tf-idf
-	for docId, doc := range v.tfIdf {
+	for _, docId := range docIds {
+		doc := v.tfIdf[docId - 1]
 		//fmt.Println(docId)
 		innerProduct := float64(0)
 		norm := float64(0) // this is norm powered by two
@@ -227,8 +228,11 @@ func (v *Vectorizer) cosineSimilarity(queryVector []float64, query []string) {
 		}
 		cos := innerProduct / math.Sqrt(norm)
 		heap.Push(v.heap, heap2.Similarity{
-			DocId: docId + 1,
+			DocId: docId,
 			Cos:   cos,
 		})
+		heapSize++
 	}
+
+	return heapSize
 }
