@@ -60,7 +60,7 @@ func vectorize(k *koanf.Koanf, f *file.File) {
 }
 
 func query(c echo.Context) error {
-	return c.JSON(http.StatusOK, v.Query(normalize.Normalize(c.Param("query"))))
+	return c.JSON(http.StatusOK, v.Query(c.Param("query")))
 }
 
 func clusterQuery(c echo.Context) error {
@@ -74,5 +74,5 @@ func clusterQuery(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, vr.Query(normalize.Normalize(c.Param("query"))))
+	return c.JSON(http.StatusOK, vr.Query(c.Param("query")))
 }

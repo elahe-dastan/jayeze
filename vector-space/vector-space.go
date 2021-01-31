@@ -4,8 +4,10 @@ import (
 	"container/heap"
 	"encoding/json"
 	"fmt"
+	"github.com/elahe-dastan/trunk/normalize"
 	"io/ioutil"
 	heap2 "jayeze/heap"
+	"jayeze/set"
 	"jayeze/tokenize"
 	"log"
 	"math"
@@ -66,8 +68,6 @@ func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
 
 	h := &heap2.SimilarityHeap{}
 	heap.Init(h)
-
-	fmt.Println(postingList)
 
 	return &Vectorizer{
 		termPostingLists: termPostingLists,
@@ -141,9 +141,15 @@ func (v *Vectorizer) calculateCenter() {
 	//fmt.Println(v.center)
 }
 
-func (v *Vectorizer) Query(query []string) string {
-	queryVector := v.queryVectorizer(query)
-	v.cosineSimilarity(queryVector)
+func (v *Vectorizer) Query(query string) string {
+	queryTerms := strings.Split(query, " ")
+	normalizedQuery := make([]string, 0)
+	for _, t := range queryTerms{
+		normalizedQuery = append(normalizedQuery, normalize.Normalize(t)...)
+	}
+
+	queryVector := v.queryVectorizer(normalizedQuery)
+	v.cosineSimilarity(queryVector, normalizedQuery)
 	answer := ""
 	for i := 0; i < 100; i++ {
 		docSimilarity := heap.Pop(v.heap).(heap2.Similarity)
@@ -188,11 +194,31 @@ func (v *Vectorizer) queryVectorizer(query []string) []float64 {
 	return vector
 }
 
+func (v *Vectorizer) indexElimination(query []string) []int{
+	docIds := set.MakeSet()
+	for _, q := range query{
+		postingList, ok := v.postingList[q]
+		if ok {
+			for _, p := range postingList{
+				docIds.Add(p)
+			}
+		}
+	}
+
+	ans := make([]int, 0)
+	for k, _ := range docIds.Container{
+		ans = append(ans, k)
+	}
+
+	return ans
+}
+
 // read only the p_docs in the posting list -- first read only the p_docs in the champion list
-func (v *Vectorizer) cosineSimilarity(queryVector []float64) {
+func (v *Vectorizer) cosineSimilarity(queryVector []float64, query []string) {
+	fmt.Println(v.indexElimination(query))
 	// query vector is not normalized and it's vector is just tf not tf-idf
 	for docId, doc := range v.tfIdf {
-		fmt.Println(docId)
+		//fmt.Println(docId)
 		innerProduct := float64(0)
 		norm := float64(0) // this is norm powered by two
 		for i, tfIdf := range doc {

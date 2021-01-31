@@ -5,26 +5,26 @@ import (
 )
 
 //MakeSet initialize the set
-func makeSet() *customSet {
+func MakeSet() *customSet {
 	return &customSet{
-		Container: make(map[string]struct{}),
+		Container: make(map[int]struct{}),
 	}
 }
 
 type customSet struct {
-	Container map[string]struct{}
+	Container map[int]struct{}
 }
 
-func (c *customSet) Exists(key string) bool {
+func (c *customSet) Exists(key int) bool {
 	_, exists := c.Container[key]
 	return exists
 }
 
-func (c *customSet) Add(key string) {
+func (c *customSet) Add(key int) {
 	c.Container[key] = struct{}{}
 }
 
-func (c *customSet) Remove(key string) error {
+func (c *customSet) Remove(key int) error {
 	_, exists := c.Container[key]
 	if !exists {
 		return fmt.Errorf("Remove Error: Item doesn't exist in set")
