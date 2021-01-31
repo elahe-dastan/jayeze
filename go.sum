@@ -13,6 +13,8 @@ github.com/elahe-dastan/trunk v0.0.0-20210130155711-0b51ade5be92 h1:8mXnEAsfLXol
 github.com/elahe-dastan/trunk v0.0.0-20210130155711-0b51ade5be92/go.mod h1:Zu/hIOqq3LVvh1iV2vggKApm/4R2rG+D1D8OiwmY0t0=
 github.com/elahe-dastan/trunk v0.0.0-20210130213157-867e73ffdb6e h1:6mZFivOQzUqYvlLEyQ60ZClWj7OOtWr9/l8uiYmGUX0=
 github.com/elahe-dastan/trunk v0.0.0-20210130213157-867e73ffdb6e/go.mod h1:Zu/hIOqq3LVvh1iV2vggKApm/4R2rG+D1D8OiwmY0t0=
+github.com/elahe-dastan/trunk v0.0.0-20210131132619-58e668c49d6e h1:9Hr5qwga39Q+6WWaOV4JKcFmBowxwZSWLyGbQM4hJNc=
+github.com/elahe-dastan/trunk v0.0.0-20210131132619-58e668c49d6e/go.mod h1:Zu/hIOqq3LVvh1iV2vggKApm/4R2rG+D1D8OiwmY0t0=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
 github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWoS4=

@@ -23,6 +23,7 @@ type Vectorizer struct {
 	termIndex        map[string]int
 	heap             *heap2.SimilarityHeap
 	center           []float64
+	postingList      map[string][]int
 }
 
 func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
@@ -36,11 +37,19 @@ func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
 	termPostingLists := make([]tokenize.TermPostingList, len(lines))
 
 	termIndex := make(map[string]int)
+	postingList := make(map[string][]int)
 
 	for i, l := range lines {
 		termPostingList := tokenize.Unmarshal(l)
 		termPostingLists[i] = termPostingList
 		termIndex[termPostingList.Term] = i
+		finalTermPostingList := tokenize.UnmarshalFinal(l)
+		docIds := make([]int, len(finalTermPostingList.PostingList))
+		for j, p := range finalTermPostingList.PostingList {
+			docIds[j] = p.DocId
+		}
+
+		postingList[finalTermPostingList.Term] = docIds
 	}
 
 	tf := make([][]int, docsNum)
@@ -58,6 +67,8 @@ func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
 	h := &heap2.SimilarityHeap{}
 	heap.Init(h)
 
+	fmt.Println(postingList)
+
 	return &Vectorizer{
 		termPostingLists: termPostingLists,
 		docsNum:          docsNum,
@@ -67,6 +78,7 @@ func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
 		termIndex:        termIndex,
 		heap:             h,
 		center:           center,
+		postingList:      postingList,
 	}
 }
 
@@ -135,7 +147,7 @@ func (v *Vectorizer) Query(query []string) string {
 	answer := ""
 	for i := 0; i < 100; i++ {
 		docSimilarity := heap.Pop(v.heap).(heap2.Similarity)
-		if docSimilarity.Cos == 0{
+		if docSimilarity.Cos == 0 {
 			break
 		}
 		ans, err := json.Marshal(docSimilarity)

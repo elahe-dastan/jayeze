@@ -3,7 +3,7 @@ module jayeze
 go 1.14
 
 require (
-	github.com/elahe-dastan/trunk v0.0.0-20210130213157-867e73ffdb6e
+	github.com/elahe-dastan/trunk v0.0.0-20210131132619-58e668c49d6e
 	github.com/knadh/koanf v0.15.0
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/mattn/go-colorable v0.1.8 // indirect
