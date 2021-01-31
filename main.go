@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/knadh/koanf"
-	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/file"
 	"jayeze/config"
 	vectorspace "jayeze/vector-space"
 	"log"
 	"net/http"
 
 	"github.com/elahe-dastan/trunk/normalize"
+	"github.com/knadh/koanf"
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
 	"github.com/labstack/echo/v4"
 )
 
@@ -60,19 +60,19 @@ func vectorize(k *koanf.Koanf, f *file.File) {
 }
 
 func query(c echo.Context) error {
-	return c.JSON(http.StatusOK, v.Query(normalize.Normalize(c.Param("query"))[0]))
+	return c.JSON(http.StatusOK, v.Query(normalize.Normalize(c.Param("query"))))
 }
 
 func clusterQuery(c echo.Context) error {
 	var vr *vectorspace.Vectorizer
 	maxCosSimilarity := float64(0)
 	for _, vector := range clusterVectors {
-		cos := vector.CenterCosineSimilarity(c.Param("query"))
+		cos := vector.CenterCosineSimilarity(normalize.Normalize(c.Param("query")))
 		if cos > maxCosSimilarity {
 			maxCosSimilarity = cos
 			vr = vector
 		}
 	}
 
-	return c.JSON(http.StatusOK, vr.Query(c.Param("query")))
+	return c.JSON(http.StatusOK, vr.Query(normalize.Normalize(c.Param("query"))))
 }

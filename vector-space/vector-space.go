@@ -129,7 +129,7 @@ func (v *Vectorizer) calculateCenter() {
 	//fmt.Println(v.center)
 }
 
-func (v *Vectorizer) Query(query string) string {
+func (v *Vectorizer) Query(query []string) string {
 	queryVector := v.queryVectorizer(query)
 	v.cosineSimilarity(queryVector)
 	answer := ""
@@ -149,7 +149,7 @@ func (v *Vectorizer) Query(query string) string {
 	return answer
 }
 
-func (v *Vectorizer) CenterCosineSimilarity(query string) float64 {
+func (v *Vectorizer) CenterCosineSimilarity(query []string) float64 {
 	queryVector := v.queryVectorizer(query)
 	// query vector is not normalized and it's vector is just tf not tf-idf
 	innerProduct := float64(0)
@@ -163,12 +163,10 @@ func (v *Vectorizer) CenterCosineSimilarity(query string) float64 {
 	return cos
 }
 
-func (v *Vectorizer) queryVectorizer(query string) []float64 {
+func (v *Vectorizer) queryVectorizer(query []string) []float64 {
 	vector := make([]float64, v.termsNum)
-
-	tokens := strings.Split(query, " ")
 	//fmt.Println(tokens)
-	for _, t := range tokens {
+	for _, t := range query {
 		index, ok := v.termIndex[t]
 		if !ok {
 			continue
