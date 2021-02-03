@@ -1,5 +1,6 @@
 indexPath: "/home/raha/go/src/shakhes/blocks4/1.txt"
 docsNum: 100
+championPath: "/home/raha/go/src/shakhes/champion.txt"
 clusters:
   - path: "/home/raha/go/src/shakhes/بهداشت/blocks4/1.txt"
     size: 60

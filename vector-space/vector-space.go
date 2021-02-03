@@ -135,7 +135,7 @@ func (v *Vectorizer) calculateCenter() {
 	//fmt.Println(v.center)
 }
 
-func (v *Vectorizer) Query(query string) string {
+func (v *Vectorizer) Query(query string, k int) string {
 	queryTerms := strings.Split(query, " ")
 	normalizedQuery := make([]string, 0)
 	for _, t := range queryTerms{
@@ -145,11 +145,12 @@ func (v *Vectorizer) Query(query string) string {
 	queryVector := v.queryVectorizer(normalizedQuery)
 	heapSize := v.cosineSimilarity(queryVector, normalizedQuery)
 	answer := ""
-	for i := 0; i < heapSize; i++ {
+	m := heapSize
+	if k < m {
+		m = k
+	}
+	for i := 0; i < m; i++ {
 		docSimilarity := heap.Pop(v.heap).(heap2.Similarity)
-		if docSimilarity.Cos == 0 {
-			break
-		}
 		ans, err := json.Marshal(docSimilarity)
 		//fmt.Println(ans)
 		if err != nil {

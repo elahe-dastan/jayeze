@@ -14,6 +14,7 @@ import (
 )
 
 var v *vectorspace.Vectorizer
+var championVector *vectorspace.Vectorizer
 var clusterVectors []*vectorspace.Vectorizer
 func main() {
 	k := koanf.New(".")
@@ -31,6 +32,7 @@ func main() {
 
 	e := echo.New()
 	e.GET("/:query", query)
+	e.GET("/champion/:query", championQuery)
 	e.GET("/cluster/:query", clusterQuery)
 	e.Logger.Fatal(e.Start(":1373"))
 }
@@ -47,9 +49,14 @@ func vectorize(k *koanf.Koanf, f *file.File) {
 		log.Fatal(err)
 	}
 
+	// main vectorizer
 	v = vectorspace.NewVectorizer(cfg.IndexPath, cfg.DocsSize)
 	v.Vectorize()
 
+	// champion vectorizer
+	championVector = vectorspace.NewVectorizer()
+
+	// cluster vectorizer
 	//clusterVectors = make([]*vectorspace.Vectorizer, 5)
 	//clusters := cfg.Clusters
 	//for i, cluster := range clusters{
@@ -60,7 +67,11 @@ func vectorize(k *koanf.Koanf, f *file.File) {
 }
 
 func query(c echo.Context) error {
-	return c.JSON(http.StatusOK, v.Query(c.Param("query")))
+	return c.JSON(http.StatusOK, v.Query(c.Param("query"), 4))
+}
+
+func championQuery(c echo.Context) error {
+	return c.JSON(http.StatusOK, v.Query(c.Param("query"), 4))
 }
 
 func clusterQuery(c echo.Context) error {
@@ -74,5 +85,5 @@ func clusterQuery(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, vr.Query(c.Param("query")))
+	return c.JSON(http.StatusOK, vr.Query(c.Param("query"), 4))
 }
