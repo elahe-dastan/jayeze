@@ -91,14 +91,7 @@ func (v *Vectorizer) calculateIDF() {
 	v.idf = make([]float64, v.termsNum)
 
 	for i, t := range v.termPostingLists {
-		count := 1
-		for j := 1; j < len(t.PostingList); j++ {
-			if t.PostingList[j] != t.PostingList[j-1] {
-				count++
-			}
-		}
-
-		v.idf[i] = math.Log10(float64(v.docsNum / count))
+		v.idf[i] = math.Log10(float64(v.docsNum / len(t.PostingList)))
 	}
 }
 
@@ -107,7 +100,7 @@ func (v *Vectorizer) calculateTF() {
 	for i, t := range v.termPostingLists {
 		for j := 0; j < len(t.PostingList); j++ {
 			docId := t.PostingList[j].DocId
-			v.tf[docId-1][i]++
+			v.tf[docId-1][i] = t.PostingList[j].Frequency
 		}
 	}
 }

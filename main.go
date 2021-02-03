@@ -54,7 +54,8 @@ func vectorize(k *koanf.Koanf, f *file.File) {
 	v.Vectorize()
 
 	// champion vectorizer
-	championVector = vectorspace.NewVectorizer()
+	//championVector = vectorspace.NewVectorizer(cfg.ChampionPath, cfg.DocsSize)
+	//championVector.Vectorize()
 
 	// cluster vectorizer
 	//clusterVectors = make([]*vectorspace.Vectorizer, 5)
@@ -71,7 +72,7 @@ func query(c echo.Context) error {
 }
 
 func championQuery(c echo.Context) error {
-	return c.JSON(http.StatusOK, v.Query(c.Param("query"), 4))
+	return c.JSON(http.StatusOK, championVector.Query(c.Param("query"), 4))
 }
 
 func clusterQuery(c echo.Context) error {
