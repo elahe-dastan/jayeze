@@ -50,21 +50,21 @@ func vectorize(k *koanf.Koanf, f *file.File) {
 	}
 
 	// main vectorizer
-	v = vectorspace.NewVectorizer(cfg.IndexPath, cfg.DocsSize)
-	v.Vectorize()
+	//v = vectorspace.NewVectorizer(cfg.IndexPath, cfg.DocsSize)
+	//v.Vectorize()
 
 	// champion vectorizer
 	//championVector = vectorspace.NewVectorizer(cfg.ChampionPath, cfg.DocsSize)
 	//championVector.Vectorize()
 
 	// cluster vectorizer
-	//clusterVectors = make([]*vectorspace.Vectorizer, 5)
-	//clusters := cfg.Clusters
-	//for i, cluster := range clusters{
-	//	vectorizer := vectorspace.NewVectorizer(cluster.Path, cluster.Size)
-	//	vectorizer.Vectorize()
-	//	clusterVectors[i] = vectorizer
-	//}
+	clusterVectors = make([]*vectorspace.Vectorizer, 5)
+	clusters := cfg.Clusters
+	for i, cluster := range clusters{
+		vectorizer := vectorspace.NewVectorizer(cluster.Path, cluster.Size)
+		vectorizer.Vectorize()
+		clusterVectors[i] = vectorizer
+	}
 }
 
 func query(c echo.Context) error {
@@ -78,8 +78,9 @@ func championQuery(c echo.Context) error {
 func clusterQuery(c echo.Context) error {
 	var vr *vectorspace.Vectorizer
 	maxCosSimilarity := float64(0)
+	normalizedQuery := normalize.Normalize(c.Param("query"))
 	for _, vector := range clusterVectors {
-		cos := vector.CenterCosineSimilarity(normalize.Normalize(c.Param("query")))
+		cos := vector.CenterCosineSimilarity(normalizedQuery)
 		if cos > maxCosSimilarity {
 			maxCosSimilarity = cos
 			vr = vector

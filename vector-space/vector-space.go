@@ -91,7 +91,9 @@ func (v *Vectorizer) calculateIDF() {
 	v.idf = make([]float64, v.termsNum)
 
 	for i, t := range v.termPostingLists {
-		v.idf[i] = math.Log10(float64(v.docsNum / len(t.PostingList)))
+		// the formula is the log of [docsNum / (number of docs containing the term)] but in the case that
+		// all the documents contain the word the answer will be ZERO so I'll use `docsNum + 1` instead of docsNum
+		v.idf[i] = math.Log10(float64((v.docsNum + 1)/ len(t.PostingList)))
 	}
 }
 
@@ -124,8 +126,6 @@ func (v *Vectorizer) calculateCenter() {
 	for i := 0; i < v.termsNum; i++ {
 		v.center[i] /= float64(v.docsNum)
 	}
-
-	//fmt.Println(v.center)
 }
 
 func (v *Vectorizer) Query(query string, k int) string {
