@@ -3,6 +3,7 @@ package vector_space
 import (
 	"container/heap"
 	"encoding/json"
+	"fmt"
 	"github.com/elahe-dastan/trunk/normalize"
 	"io/ioutil"
 	heap2 "jayeze/heap"
@@ -93,7 +94,10 @@ func (v *Vectorizer) calculateIDF() {
 	for i, t := range v.termPostingLists {
 		// the formula is the log of [docsNum / (number of docs containing the term)] but in the case that
 		// all the documents contain the word the answer will be ZERO so I'll use `docsNum + 1` instead of docsNum
-		v.idf[i] = math.Log10(float64((v.docsNum + 1)/ len(t.PostingList)))
+		if i == 2899{
+			fmt.Println()
+		}
+		v.idf[i] = math.Log10(float64(v.docsNum + 1)/ float64(len(t.PostingList)))
 	}
 }
 

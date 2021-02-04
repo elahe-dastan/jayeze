@@ -5,6 +5,7 @@ import (
 	vectorspace "jayeze/vector-space"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/elahe-dastan/trunk/normalize"
 	"github.com/knadh/koanf"
@@ -31,9 +32,9 @@ func main() {
 	vectorize(k, f)
 
 	e := echo.New()
-	e.GET("/:query", query)
-	e.GET("/champion/:query", championQuery)
-	e.GET("/cluster/:query", clusterQuery)
+	e.GET("/", query)
+	e.GET("/champion/", championQuery)
+	e.GET("/cluster/", clusterQuery)
 	e.Logger.Fatal(e.Start(":1373"))
 }
 
@@ -50,35 +51,39 @@ func vectorize(k *koanf.Koanf, f *file.File) {
 	}
 
 	// main vectorizer
-	//v = vectorspace.NewVectorizer(cfg.IndexPath, cfg.DocsSize)
-	//v.Vectorize()
+	v = vectorspace.NewVectorizer(cfg.IndexPath, cfg.DocsSize)
+	v.Vectorize()
 
 	// champion vectorizer
 	//championVector = vectorspace.NewVectorizer(cfg.ChampionPath, cfg.DocsSize)
 	//championVector.Vectorize()
 
 	// cluster vectorizer
-	clusterVectors = make([]*vectorspace.Vectorizer, 5)
-	clusters := cfg.Clusters
-	for i, cluster := range clusters{
-		vectorizer := vectorspace.NewVectorizer(cluster.Path, cluster.Size)
-		vectorizer.Vectorize()
-		clusterVectors[i] = vectorizer
-	}
+	//clusterVectors = make([]*vectorspace.Vectorizer, 5)
+	//clusters := cfg.Clusters
+	//for i, cluster := range clusters{
+	//	vectorizer := vectorspace.NewVectorizer(cluster.Path, cluster.Size)
+	//	vectorizer.Vectorize()
+	//	clusterVectors[i] = vectorizer
+	//}
 }
 
 func query(c echo.Context) error {
-	return c.JSON(http.StatusOK, v.Query(c.Param("query"), 4))
+	return c.JSON(http.StatusOK, v.Query(c.QueryParam("query"), 4))
 }
 
 func championQuery(c echo.Context) error {
-	return c.JSON(http.StatusOK, championVector.Query(c.Param("query"), 4))
+	return c.JSON(http.StatusOK, championVector.Query(c.QueryParam("query"), 4))
 }
 
 func clusterQuery(c echo.Context) error {
 	var vr *vectorspace.Vectorizer
 	maxCosSimilarity := float64(0)
-	normalizedQuery := normalize.Normalize(c.Param("query"))
+	queryTerms := strings.Split(c.QueryParam("query"), " ")
+	normalizedQuery := make([]string, 0)
+	for _, t := range queryTerms{
+		normalizedQuery = append(normalizedQuery, normalize.Normalize(t)...)
+	}
 	for _, vector := range clusterVectors {
 		cos := vector.CenterCosineSimilarity(normalizedQuery)
 		if cos > maxCosSimilarity {
@@ -87,5 +92,5 @@ func clusterQuery(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, vr.Query(c.Param("query"), 4))
+	return c.JSON(http.StatusOK, vr.Query(c.QueryParam("query"), 4))
 }
