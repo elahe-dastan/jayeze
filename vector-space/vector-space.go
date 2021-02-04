@@ -3,7 +3,6 @@ package vector_space
 import (
 	"container/heap"
 	"encoding/json"
-	"fmt"
 	"github.com/elahe-dastan/trunk/normalize"
 	"io/ioutil"
 	heap2 "jayeze/heap"
@@ -25,6 +24,7 @@ type Vectorizer struct {
 	heap             *heap2.SimilarityHeap
 	center           []float64
 	postingList      map[string][]int
+	IndexPath        string
 }
 
 func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
@@ -78,6 +78,7 @@ func NewVectorizer(indexPath string, docsNum int) *Vectorizer {
 		heap:             h,
 		center:           center,
 		postingList:      postingList,
+		IndexPath:        indexPath,
 	}
 }
 
@@ -94,10 +95,7 @@ func (v *Vectorizer) calculateIDF() {
 	for i, t := range v.termPostingLists {
 		// the formula is the log of [docsNum / (number of docs containing the term)] but in the case that
 		// all the documents contain the word the answer will be ZERO so I'll use `docsNum + 1` instead of docsNum
-		if i == 2899{
-			fmt.Println()
-		}
-		v.idf[i] = math.Log10(float64(v.docsNum + 1)/ float64(len(t.PostingList)))
+		v.idf[i] = math.Log10(float64(v.docsNum+1) / float64(len(t.PostingList)))
 	}
 }
 
@@ -135,7 +133,7 @@ func (v *Vectorizer) calculateCenter() {
 func (v *Vectorizer) Query(query string, k int) string {
 	queryTerms := strings.Split(query, " ")
 	normalizedQuery := make([]string, 0)
-	for _, t := range queryTerms{
+	for _, t := range queryTerms {
 		normalizedQuery = append(normalizedQuery, normalize.Normalize(t)...)
 	}
 
@@ -186,19 +184,19 @@ func (v *Vectorizer) queryVectorizer(query []string) []float64 {
 	return vector
 }
 
-func (v *Vectorizer) indexElimination(query []string) []int{
+func (v *Vectorizer) indexElimination(query []string) []int {
 	docIds := set.MakeSet()
-	for _, q := range query{
+	for _, q := range query {
 		postingList, ok := v.postingList[q]
 		if ok {
-			for _, p := range postingList{
+			for _, p := range postingList {
 				docIds.Add(p)
 			}
 		}
 	}
 
 	ans := make([]int, 0)
-	for k, _ := range docIds.Container{
+	for k, _ := range docIds.Container {
 		ans = append(ans, k)
 	}
 
@@ -211,8 +209,7 @@ func (v *Vectorizer) cosineSimilarity(queryVector []float64, query []string) int
 	docIds := v.indexElimination(query)
 	// query vector is not normalized and it's vector is just tf not tf-idf
 	for _, docId := range docIds {
-		doc := v.tfIdf[docId - 1]
-		//fmt.Println(docId)
+		doc := v.tfIdf[docId-1]
 		innerProduct := float64(0)
 		norm := float64(0) // this is norm powered by two
 		for i, tfIdf := range doc {
